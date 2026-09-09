@@ -46,7 +46,7 @@ jobs:
           git rev-parse HEAD
 
       - name: Build React application
-        run: CI=false npm run build
+        run: unset CI && npm run build
 
       - name: Build Docker image
         run: docker build -t docker-reactjs:${{ github.sha }} .
