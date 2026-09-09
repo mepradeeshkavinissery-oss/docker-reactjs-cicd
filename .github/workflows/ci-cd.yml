@@ -36,6 +36,15 @@ jobs:
       - name: Run tests
         run: npm test -- --watchAll=false
 
+      - name: Verify source before build
+        run: |
+          echo "=== APP.JS BEFORE BUILD ==="
+          sed -n '1,10p' src/App.js
+          echo "=== MAIN-CONTAINER.JS BEFORE BUILD ==="
+          grep -n "Object.keys" src/components/main-container.js
+          echo "=== GIT COMMIT ==="
+          git rev-parse HEAD
+
       - name: Build React application
         run: npm run build
 
