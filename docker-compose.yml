@@ -1,0 +1,10 @@
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docker-reactjs:1.0
+    container_name: react-app
+    ports:
+      - "80:80"
+    restart: unless-stopped
