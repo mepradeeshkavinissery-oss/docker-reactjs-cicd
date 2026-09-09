@@ -33,6 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Run tests
         run: npm test -- --watchAll=false
 
