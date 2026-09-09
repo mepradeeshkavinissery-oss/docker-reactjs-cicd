@@ -16,6 +16,15 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Verify checked out commit and source
+        run: |
+          echo "GitHub SHA: $GITHUB_SHA"
+          git rev-parse HEAD
+          echo "App.js:"
+          sed -n '1,10p' src/App.js
+          echo "MainContainer:"
+          grep -n "Object.keys" src/components/main-container.js
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
