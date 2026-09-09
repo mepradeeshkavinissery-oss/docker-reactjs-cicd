@@ -20,8 +20,10 @@ jobs:
         run: |
           echo "GitHub SHA: $GITHUB_SHA"
           git rev-parse HEAD
+
           echo "App.js:"
           sed -n '1,10p' src/App.js
+
           echo "MainContainer:"
           grep -n "Object.keys" src/components/main-container.js
 
@@ -46,8 +48,10 @@ jobs:
         run: |
           echo "=== APP.JS BEFORE BUILD ==="
           sed -n '1,10p' src/App.js
+
           echo "=== MAIN-CONTAINER.JS BEFORE BUILD ==="
           grep -n "Object.keys" src/components/main-container.js
+
           echo "=== GIT COMMIT ==="
           git rev-parse HEAD
 
@@ -55,4 +59,38 @@ jobs:
         run: unset CI && npm run build
 
       - name: Build Docker image
-        run: docker build -t docker-reactjs:${{ github.sha }} .
+        run: |
+          docker build \
+            -t docker-reactjs:${{ github.sha }} \
+            .
+
+      - name: Configure Docker for Nexus HTTP registry
+        run: |
+          echo '{
+            "insecure-registries": [
+              "${{ secrets.NEXUS_REGISTRY }}"
+            ]
+          }' | sudo tee /etc/docker/daemon.json
+
+          sudo systemctl restart docker
+
+          echo "=== Docker Insecure Registry Configuration ==="
+          docker info | grep -A5 -i "Insecure Registries"
+
+      - name: Login to Nexus
+        run: |
+          echo "${{ secrets.NEXUS_PASSWORD }}" | \
+          docker login "${{ secrets.NEXUS_REGISTRY }}" \
+            --username "${{ secrets.NEXUS_USERNAME }}" \
+            --password-stdin
+
+      - name: Tag Docker image for Nexus
+        run: |
+          docker tag \
+            docker-reactjs:${{ github.sha }} \
+            ${{ secrets.NEXUS_REGISTRY }}/docker-reactjs:${{ github.sha }}
+
+      - name: Push Docker image to Nexus
+        run: |
+          docker push \
+            ${{ secrets.NEXUS_REGISTRY }}/docker-reactjs:${{ github.sha }}
