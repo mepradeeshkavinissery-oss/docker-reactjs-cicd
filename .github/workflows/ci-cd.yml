@@ -94,3 +94,21 @@ jobs:
         run: |
           docker push \
             ${{ secrets.NEXUS_REGISTRY }}/docker-reactjs:${{ github.sha }}
+
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | \
+          docker login \
+            --username "${{ secrets.DOCKERHUB_USERNAME }}" \
+            --password-stdin
+
+      - name: Tag Docker image for Docker Hub
+        run: |
+          docker tag \
+            docker-reactjs:${{ github.sha }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/docker-reactjs:${{ github.sha }}
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push \
+            ${{ secrets.DOCKERHUB_USERNAME }}/docker-reactjs:${{ github.sha }}
