@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 jest.mock('axios', () => ({
-  get: jest.fn(() => Promise.resolve({
-    data: {}
-  }))
+  get: jest.fn(() =>
+    Promise.resolve({
+      data: {}
+    })
+  )
 }));
 
 import App from './App';
